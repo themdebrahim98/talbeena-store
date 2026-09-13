@@ -1,0 +1,15 @@
+rules_version = '2';
+
+// Product imagery: public reads for the storefront, staff-only writes.
+// All uploads go through server actions (Admin SDK); client uploads are off.
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /products/{allPaths=**} {
+      allow read: if true;
+      allow write: if request.auth != null && request.auth.token.admin == true;
+    }
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

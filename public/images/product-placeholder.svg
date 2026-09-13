@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="600" viewBox="0 0 600 600">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f6f1e3"/>
+      <stop offset="1" stop-color="#eae0c8"/>
+    </linearGradient>
+    <radialGradient id="gold" cx="0.5" cy="0.4" r="0.6">
+      <stop offset="0" stop-color="#f6cf7a"/>
+      <stop offset="1" stop-color="#c9a03f"/>
+    </radialGradient>
+  </defs>
+  <rect width="600" height="600" fill="url(#bg)"/>
+  <g transform="translate(300 300)">
+    <circle r="230" fill="#2f6b47" opacity="0.05"/>
+    <circle r="160" fill="#2f6b47" opacity="0.05"/>
+  </g>
+  <!-- shaker/pouch -->
+  <path d="M220 420 Q300 330 380 420 Q390 470 350 500 Q300 525 250 500 Q210 470 220 420 Z" fill="#fdfcf7" stroke="#d8cbb0" stroke-width="4"/>
+  <rect x="225" y="322" width="150" height="110" rx="16" fill="#fffdf6" stroke="#d8cbb0" stroke-width="4"/>
+  <rect x="240" y="340" width="120" height="14" rx="7" fill="#c9a03f"/>
+  <rect x="240" y="364" width="96" height="12" rx="6" fill="#2f6b47" opacity="0.75"/>
+  <rect x="240" y="388" width="120" height="12" rx="6" fill="#2f6b47" opacity="0.35"/>
+  <ellipse cx="300" cy="440" rx="60" ry="40" fill="url(#gold)"/>
+</svg>

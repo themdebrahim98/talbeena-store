@@ -1,0 +1,122 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+
+    "users": {
+      "$uid": {
+        ".read": "auth !== null && (auth.uid === $uid || auth.token.admin === true)",
+        ".write": "auth !== null && (auth.uid === $uid || auth.token.admin === true)"
+      }
+    },
+
+    "categories": {
+      ".read": true,
+      ".indexOn": ["isActive", "slug"],
+      "$id": {
+        ".write": "auth !== null && auth.token.admin === true"
+      }
+    },
+
+    "products": {
+      ".read": true,
+      ".indexOn": ["isActive", "categoryId", "slug"],
+      "$id": {
+        ".write": "auth !== null && auth.token.admin === true"
+      }
+    },
+
+    "productImages": {
+      ".read": true,
+      ".indexOn": ["productId"],
+      "$id": {
+        ".write": "auth !== null && auth.token.admin === true"
+      }
+    },
+
+    "productVariants": {
+      ".read": true,
+      ".indexOn": ["productId"],
+      "$id": {
+        ".write": "auth !== null && auth.token.admin === true"
+      }
+    },
+
+    "productIndex": {
+      ".read": true,
+      ".write": "auth !== null && auth.token.admin === true"
+    },
+
+    "carts": {
+      "$uid": {
+        ".read": "auth !== null && auth.uid === $uid",
+        ".write": "auth !== null && auth.uid === $uid"
+      }
+    },
+
+    "wishlist": {
+      "$uid": {
+        ".read": "auth !== null && auth.uid === $uid",
+        ".write": "auth !== null && auth.uid === $uid"
+      }
+    },
+
+    "addresses": {
+      "$uid": {
+        ".read": "auth !== null && (auth.uid === $uid || auth.token.admin === true)",
+        ".write": "auth !== null && (auth.uid === $uid || auth.token.admin === true)"
+      }
+    },
+
+    "orders": {
+      ".indexOn": ["userId", "createdAt", "status"],
+      "$id": {
+        ".read": "auth !== null && (auth.uid === data.child('userId').val() || auth.token.admin === true)",
+        ".write": "auth !== null && auth.token.admin === true"
+      }
+    },
+
+    "orderItems": {
+      "$orderId": {
+        ".read": "auth !== null && (auth.uid === root.child('orders').child($orderId).child('userId').val() || auth.token.admin === true)",
+        ".write": "auth !== null && auth.token.admin === true"
+      }
+    },
+
+    "coupons": {
+      ".read": "auth !== null",
+      "$code": {
+        ".write": "auth !== null && auth.token.admin === true"
+      }
+    },
+
+    "couponUsages": {
+      "$code": {
+        "$uid": {
+          ".read": "auth !== null && (auth.uid === $uid || auth.token.admin === true)",
+          ".write": "auth !== null && (auth.uid === $uid || auth.token.admin === true)"
+        }
+      }
+    },
+
+    "reviews": {
+      ".read": true,
+      "$id": {
+        ".write": "auth !== null && (auth.uid === data.child('userId').val() || (!data.exists() && auth.uid === newData.child('userId').val()) || auth.token.admin === true)"
+      }
+    },
+
+    "payments": {
+      ".indexOn": ["orderId", "userId", "razorpayOrderId"],
+      "$id": {
+        ".read": "auth !== null && (auth.uid === data.child('userId').val() || auth.token.admin === true)",
+        ".write": "auth !== null && auth.token.admin === true"
+      }
+    },
+
+    "newsletters": {
+      ".read": "auth !== null && auth.token.admin === true",
+      ".write": "auth !== null && auth.token.admin === true"
+    }
+  }
+}

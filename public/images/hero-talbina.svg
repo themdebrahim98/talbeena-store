@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="800" viewBox="0 0 800 800">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fdf7ec"/>
+      <stop offset="1" stop-color="#f1e8d6"/>
+    </linearGradient>
+    <radialGradient id="porridge" cx="0.5" cy="0.4" r="0.7">
+      <stop offset="0" stop-color="#f6cf7a"/>
+      <stop offset="1" stop-color="#d9a544"/>
+    </radialGradient>
+  </defs>
+  <rect width="800" height="800" fill="url(#bg)"/>
+  <g transform="translate(400 400)">
+    <circle r="300" fill="#2f6b47" opacity="0.06"/>
+    <circle r="210" fill="#2f6b47" opacity="0.06"/>
+    <circle r="120" fill="#2f6b47" opacity="0.06"/>
+  </g>
+  <!-- saucer -->
+  <ellipse cx="400" cy="560" rx="260" ry="36" fill="#c49a4a" opacity="0.25"/>
+  <!-- bowl body -->
+  <path d="M175 400 Q400 340 625 400 Q640 470 590 520 Q500 610 400 612 Q300 610 210 520 Q160 470 175 400 Z" fill="#efe6d2" stroke="#d8cbb0" stroke-width="4"/>
+  <!-- bowl rim -->
+  <ellipse cx="400" cy="400" rx="225" ry="42" fill="#f8f2e4" stroke="#d8cbb0" stroke-width="4"/>
+  <!-- porridge filling -->
+  <ellipse cx="416" cy="396" rx="188" ry="30" fill="url(#porridge)"/>
+  <!-- steam -->
+  <g stroke="#b98a2e" stroke-width="7" stroke-linecap="round" fill="none" opacity="0.35">
+    <path d="M300 300 Q290 280 305 260 Q320 240 305 215"/>
+    <path d="M470 285 Q480 265 465 245 Q450 225 465 200"/>
+  </g>
+  <!-- garnishes: dates -->
+  <ellipse cx="350" cy="392" rx="20" ry="12" fill="#5a3d26" transform="rotate(-20 350 392)"/>
+  <ellipse cx="520" cy="399" rx="20" ry="12" fill="#5a3d26" transform="rotate(15 520 399)"/>
+  <!-- almonds -->
+  <ellipse cx="430" cy="385" rx="13" ry="8" fill="#e8b46a" transform="rotate(-35 430 385)"/>
+  <ellipse cx="385" cy="404" rx="13" ry="8" fill="#e8b46a" transform="rotate(30 385 404)"/>
+  <!-- honey drizzle -->
+  <path d="M440 388 Q470 380 480 396" stroke="#e0892f" stroke-width="8" stroke-linecap="round" fill="none" opacity="0.5"/>
+  <path d="M360 398 Q340 392 330 402" stroke="#e0892f" stroke-width="8" stroke-linecap="round" fill="none" opacity="0.5"/>
+</svg>
