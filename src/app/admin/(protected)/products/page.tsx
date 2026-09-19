@@ -4,6 +4,7 @@ import { PackagePlus } from "lucide-react";
 
 import { Button } from "@/components/primitives/button";
 import { Input } from "@/components/primitives/input";
+import { CustomSelect, type SelectOption } from "@/components/primitives/custom-select";
 import { DeleteProductButton } from "@/components/admin/delete-product-button";
 import { formatINR } from "@/lib/format";
 import { getAdminProducts, getAllCategories } from "@/queries/admin";
@@ -77,19 +78,21 @@ export default async function AdminProductsPage({
           className="w-full sm:max-w-xs h-9 rounded-xl bg-card"
         />
         <div className="flex items-center gap-2">
-          <select
+          <CustomSelect
             name="category"
             defaultValue={category}
-            aria-label="Filter by category"
-            className="h-9 flex-1 sm:flex-none rounded-xl border border-input bg-card px-2.5 text-xs sm:text-sm outline-none focus-visible:border-ring shadow-xs"
-          >
-            <option value="">All categories</option>
-            {categories.map((c) => (
-              <option key={c.slug} value={c.slug}>
-                {c.name}
-              </option>
-            ))}
-          </select>
+            options={[
+              { value: "", label: "All categories" },
+              ...categories.map((c) => ({
+                value: c.slug,
+                label: c.name,
+                badge: c.isActive ? undefined : "inactive",
+              })),
+            ]}
+            placeholder="All categories"
+            className="flex-1 sm:w-48"
+            autoSubmit={true}
+          />
           <Button type="submit" variant="outline" size="sm" className="h-9 rounded-xl px-3 text-xs">
             Filter
           </Button>

@@ -8,6 +8,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/primitives/ale
 import { Button } from "@/components/primitives/button";
 import { Input } from "@/components/primitives/input";
 import { Label } from "@/components/primitives/label";
+import { CustomSelect } from "@/components/primitives/custom-select";
 import { toast } from "@/components/primitives/toast";
 import type { ActionState } from "@/actions/auth";
 import type { AdminCategory } from "@/queries/admin";
@@ -87,9 +88,6 @@ interface ProductFormProps {
 
 const TEXTAREA_CLASSES =
   "min-h-24 w-full rounded-lg border border-input bg-transparent px-2.5 py-2 text-base transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 md:text-sm dark:bg-input/30";
-
-const SELECT_CLASSES =
-  "h-8 w-full rounded-lg border border-input bg-transparent px-2 text-sm outline-none focus-visible:border-ring";
 
 /**
  * Create/edit product form. All inputs are controlled (values live in React
@@ -326,24 +324,19 @@ export function ProductForm({
 
         <div className="space-y-2">
           <Label htmlFor="categorySlug">Category</Label>
-          <select
+          <CustomSelect
             id="categorySlug"
             name="categorySlug"
             value={values.categorySlug}
-            onChange={(e) => set("categorySlug", e.target.value)}
+            onChange={(val) => set("categorySlug", val)}
+            options={categories.map((c) => ({
+              value: c.slug,
+              label: c.name,
+              badge: c.isActive ? undefined : "inactive",
+            }))}
+            placeholder="Choose a category"
             required
-            className={SELECT_CLASSES}
-          >
-            <option value="" disabled>
-              Choose a category
-            </option>
-            {categories.map((c) => (
-              <option key={c.slug} value={c.slug}>
-                {c.name}
-                {c.isActive ? "" : " (inactive)"}
-              </option>
-            ))}
-          </select>
+          />
           {categories.length === 0 && (
             <p className="text-xs text-destructive">
               No categories yet — run <code>npm run seed</code> first.
@@ -451,20 +444,15 @@ export function ProductForm({
             </div>
             <div className="space-y-2">
               <Label htmlFor="unit">Unit</Label>
-              <select
+              <CustomSelect
                 id="unit"
                 name="unit"
                 value={values.unit}
-                onChange={(e) => set("unit", e.target.value)}
+                onChange={(val) => set("unit", val)}
+                options={UNITS.map((u) => ({ value: u, label: u }))}
+                placeholder="Choose a unit"
                 required
-                className={SELECT_CLASSES}
-              >
-                {UNITS.map((u) => (
-                  <option key={u} value={u}>
-                    {u}
-                  </option>
-                ))}
-              </select>
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor="lowStockThreshold">Low-stock alert at</Label>

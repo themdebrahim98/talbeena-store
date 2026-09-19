@@ -3,6 +3,14 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { Search, X } from "lucide-react";
 import { Input } from "@/components/primitives/input";
+import { CustomSelect } from "@/components/primitives/custom-select";
+
+const SORT_OPTIONS = [
+  { value: "featured", label: "Featured" },
+  { value: "price-asc", label: "Price: Low to High" },
+  { value: "price-desc", label: "Price: High to Low" },
+  { value: "newest", label: "Newest Arrivals" },
+];
 
 export function CatalogToolbar() {
   const router = useRouter();
@@ -32,10 +40,6 @@ export function CatalogToolbar() {
     updateParam("search", "");
   };
 
-  const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    updateParam("sort", e.target.value);
-  };
-
   return (
     <div className="flex items-center gap-3">
       <form onSubmit={handleSearchSubmit} className="relative flex-1 sm:w-60">
@@ -44,8 +48,8 @@ export function CatalogToolbar() {
           key={currentSearch}
           name="search"
           defaultValue={currentSearch}
-          placeholder="Search pantry…"
-          className="pl-9 pr-8 text-xs h-9 rounded-full bg-card"
+          placeholder="Search catalog…"
+          className="pl-9 pr-8 h-9 rounded-full bg-card"
         />
         {currentSearch && (
           <button
@@ -59,17 +63,13 @@ export function CatalogToolbar() {
         )}
       </form>
 
-      <select
+      <CustomSelect
         value={currentSort}
-        onChange={handleSortChange}
-        className="h-9 rounded-full border bg-card px-3 text-xs font-medium text-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-primary shadow-xs"
-        aria-label="Sort products"
-      >
-        <option value="featured">Featured</option>
-        <option value="price-asc">Price: Low to High</option>
-        <option value="price-desc">Price: High to Low</option>
-        <option value="newest">Newest Arrivals</option>
-      </select>
+        onChange={(val) => updateParam("sort", val)}
+        options={SORT_OPTIONS}
+        className="w-44"
+        triggerClassName="rounded-full px-3.5 h-9 text-xs"
+      />
     </div>
   );
 }
