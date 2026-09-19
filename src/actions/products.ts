@@ -3,6 +3,8 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
+import path from "node:path";
+import fs from "node:fs/promises";
 import { getAdminDb } from "@/lib/firebase/admin";
 import type { Category, Product, ProductImage } from "@/types/firebase";
 import { requireAdmin } from "@/queries/admin";
@@ -264,6 +266,17 @@ export async function deleteProductAction(
     await db.ref().update(updates);
   } catch {
     return { ok: false, error: "Could not delete the product. Try again." };
+  }
+
+  // Clean up any custom uploaded image from public/uploads/products/
+  if (product.primaryImageUrl?.startsWith("/uploads/products/")) {
+    try {
+      const fileName = path.basename(product.primaryImageUrl);
+      const filePath = path.join(process.cwd(), "public", "uploads", "products", fileName);
+      await fs.unlink(filePath).catch(() => {});
+    } catch {
+      // Non-blocking if file already removed or missing
+    }
   }
 
   revalidatePath("/admin/products");

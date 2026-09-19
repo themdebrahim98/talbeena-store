@@ -6,6 +6,7 @@ import {
   ProductForm,
   type ProductFormDefaults,
 } from "@/components/admin/product-form";
+import { DeleteProductButton } from "@/components/admin/delete-product-button";
 import { updateProductAction } from "@/actions/products";
 import { getAdminProduct, getAllCategories } from "@/queries/admin";
 
@@ -53,17 +54,25 @@ export default async function EditProductPage({
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
-      <div>
-        <Link
-          href="/admin/products"
-          className="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground hover:text-foreground mb-2"
-        >
-          <ChevronLeft className="size-3.5" /> Back to Products
-        </Link>
-        <h1 className="text-xl sm:text-2xl font-bold tracking-tight">Edit Product</h1>
-        <p className="text-xs sm:text-sm text-muted-foreground">
-          {product.name} <span className="text-muted-foreground/70">· /{product.slug}</span>
-        </p>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <Link
+            href="/admin/products"
+            className="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground hover:text-foreground mb-2"
+          >
+            <ChevronLeft className="size-3.5" /> Back to Products
+          </Link>
+          <h1 className="text-xl sm:text-2xl font-bold tracking-tight">Edit Product</h1>
+          <p className="text-xs sm:text-sm text-muted-foreground">
+            {product.name} <span className="text-muted-foreground/70">· /{product.slug}</span>
+          </p>
+        </div>
+        <DeleteProductButton
+          slug={product.slug}
+          name={product.name}
+          redirectTo="/admin/products"
+          variant="button"
+        />
       </div>
 
       <div className="rounded-2xl sm:rounded-3xl border bg-card p-4 sm:p-6 shadow-xs">

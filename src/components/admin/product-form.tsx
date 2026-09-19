@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useActionState, useState } from "react";
-import { Check, Sparkles, Upload } from "lucide-react";
+import { Check, Sparkles, Trash2, Upload } from "lucide-react";
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/primitives/alert";
 import { Button } from "@/components/primitives/button";
@@ -133,7 +133,10 @@ export function ProductForm({
     defaults.primaryImageUrl || "/images/products/talbina-classic.jpg",
   );
   const [uploading, setUploading] = useState(false);
+  const [deletingImage, setDeletingImage] = useState(false);
   const [showGallery, setShowGallery] = useState(false);
+
+  const isUploadedImage = selectedImage?.startsWith("/uploads/products/");
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -159,6 +162,41 @@ export function ProductForm({
       toast.error("Network error uploading image");
     } finally {
       setUploading(false);
+      e.target.value = "";
+    }
+  };
+
+  const handleDeleteImage = async () => {
+    if (!selectedImage) return;
+
+    if (isUploadedImage) {
+      const confirmDelete = window.confirm(
+        "Delete this uploaded image file from the server? This action cannot be undone.",
+      );
+      if (!confirmDelete) return;
+
+      setDeletingImage(true);
+      try {
+        const res = await fetch("/api/admin/upload-image", {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ url: selectedImage }),
+        });
+        const data = await res.json();
+        if (res.ok) {
+          setSelectedImage("");
+          toast.success("Uploaded image deleted from server");
+        } else {
+          toast.error(data.error || "Failed to delete image file");
+        }
+      } catch {
+        toast.error("Network error deleting image");
+      } finally {
+        setDeletingImage(false);
+      }
+    } else {
+      setSelectedImage("");
+      toast.success("Image selection cleared");
     }
   };
 
@@ -491,15 +529,40 @@ export function ProductForm({
                   className="sr-only"
                 />
               </label>
+
+              {selectedImage && selectedImage !== "/images/product-placeholder.svg" && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  disabled={deletingImage || uploading}
+                  className="gap-1.5 text-xs h-8 text-destructive hover:bg-destructive/10 hover:text-destructive border-destructive/20"
+                  onClick={handleDeleteImage}
+                  title={isUploadedImage ? "Permanently delete uploaded file from server" : "Remove image selection"}
+                >
+                  <Trash2 className="size-3.5" />
+                  {deletingImage
+                    ? "Deleting…"
+                    : isUploadedImage
+                      ? "Delete File"
+                      : "Remove"}
+                </Button>
+              )}
             </div>
 
-            <div className="flex items-center gap-2 pt-1">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-2 pt-1">
               <Input
                 placeholder="Or paste direct image URL…"
                 value={selectedImage}
                 onChange={(e) => setSelectedImage(e.target.value)}
                 className="text-xs h-8 max-w-md bg-card"
               />
+              {isUploadedImage && (
+                <span className="text-[11px] text-muted-foreground flex items-center gap-1">
+                  <span className="size-1.5 rounded-full bg-emerald-500 inline-block" />
+                  Uploaded server file
+                </span>
+              )}
             </div>
           </div>
         </div>
