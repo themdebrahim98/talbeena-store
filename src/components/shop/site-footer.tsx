@@ -44,11 +44,26 @@ export function SiteFooter() {
 
           {/* Contact */}
           <div className="space-y-3">
-            <h4 className="text-sm font-semibold">Contact</h4>
+            <h4 className="text-sm font-semibold text-foreground">Contact</h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
-              <li>{siteConfig.contact.email}</li>
-              <li>{siteConfig.contact.phone}</li>
-              <li>{siteConfig.contact.address}</li>
+              <li className="font-semibold text-foreground">{siteConfig.contact.name}</li>
+              <li>
+                <a
+                  href={`tel:${siteConfig.contact.phoneRaw}`}
+                  className="hover:text-foreground transition-colors"
+                >
+                  {siteConfig.contact.phone}
+                </a>
+              </li>
+              <li>
+                <a
+                  href={`mailto:${siteConfig.contact.email}`}
+                  className="hover:text-foreground transition-colors"
+                >
+                  {siteConfig.contact.email}
+                </a>
+              </li>
+              <li className="leading-snug">{siteConfig.contact.address}</li>
             </ul>
           </div>
         </div>
