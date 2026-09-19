@@ -186,18 +186,23 @@ export function OrderDetailView({ orderData }: OrderDetailViewProps) {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <Button variant="ghost" size="sm" render={<Link href="/admin/orders" />}>
-          <ArrowLeft className="size-4 mr-1" /> Back to Orders
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <Button
+          variant="ghost"
+          size="sm"
+          className="self-start gap-1.5"
+          render={<Link href="/admin/orders" />}
+        >
+          <ArrowLeft className="size-4" /> Back to Orders
         </Button>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center justify-between sm:justify-end gap-2 bg-card sm:bg-transparent p-2 sm:p-0 rounded-2xl border sm:border-0 shadow-xs sm:shadow-none">
           <span className="text-xs font-semibold text-muted-foreground">Order Status:</span>
           <select
             value={status}
             disabled={updating}
             onChange={(e) => handleStatusChange(e.target.value as OrderStatus)}
-            className="rounded-lg border bg-card px-3 py-1.5 text-xs font-bold focus-visible:ring-2 focus-visible:ring-primary shadow-xs"
+            className="rounded-xl border bg-background px-3 py-1.5 text-xs font-bold focus-visible:ring-2 focus-visible:ring-primary shadow-xs cursor-pointer"
           >
             {STATUS_OPTIONS.map((opt) => (
               <option key={opt} value={opt}>

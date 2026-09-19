@@ -25,7 +25,7 @@ const navItems = [
 ];
 
 /** Pathname-aware admin sidebar nav (client: highlights the active section). */
-export function AdminNav() {
+export function AdminNav({ onNavigate }: { onNavigate?: () => void } = {}) {
   const pathname = usePathname();
 
   return (
@@ -39,11 +39,12 @@ export function AdminNav() {
           <Link
             key={item.href}
             href={item.href}
+            onClick={onNavigate}
             aria-current={active ? "page" : undefined}
             className={cn(
               "flex items-center gap-2.5 rounded-md px-3 py-2 text-sm font-medium transition-colors",
               active
-                ? "bg-primary/10 text-primary"
+                ? "bg-primary/10 text-primary font-semibold"
                 : "text-muted-foreground hover:bg-accent hover:text-foreground",
             )}
           >

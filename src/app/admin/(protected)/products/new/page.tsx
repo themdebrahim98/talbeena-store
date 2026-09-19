@@ -1,3 +1,5 @@
+import Link from "next/link";
+import { ChevronLeft } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/primitives/alert";
 import {
   EMPTY_PRODUCT,
@@ -17,8 +19,14 @@ export default async function NewProductPage() {
   return (
     <div className="mx-auto max-w-3xl space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Add product</h1>
-        <p className="text-sm text-muted-foreground">
+        <Link
+          href="/admin/products"
+          className="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground hover:text-foreground mb-2"
+        >
+          <ChevronLeft className="size-3.5" /> Back to Products
+        </Link>
+        <h1 className="text-xl sm:text-2xl font-bold tracking-tight">Add Product</h1>
+        <p className="text-xs sm:text-sm text-muted-foreground">
           Create a new product in the live catalog.
         </p>
       </div>
@@ -33,7 +41,7 @@ export default async function NewProductPage() {
         </Alert>
       )}
 
-      <div className="rounded-xl border bg-card p-4 sm:p-6">
+      <div className="rounded-2xl sm:rounded-3xl border bg-card p-4 sm:p-6 shadow-xs">
         <ProductForm
           action={createProductAction}
           categories={categories}

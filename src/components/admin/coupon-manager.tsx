@@ -103,16 +103,16 @@ export function CouponManager({ initialCoupons }: CouponManagerProps) {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Coupons &amp; Promotions</h1>
-          <p className="text-sm text-muted-foreground">
+          <h1 className="text-xl sm:text-2xl font-bold tracking-tight">Coupons &amp; Promotions</h1>
+          <p className="text-xs sm:text-sm text-muted-foreground">
             Create discount codes to drive customer conversions and reward loyal shoppers.
           </p>
         </div>
 
         {!showForm && (
-          <Button onClick={() => setShowForm(true)} className="gap-1.5" size="sm">
+          <Button onClick={() => setShowForm(true)} className="gap-1.5 w-full sm:w-auto" size="sm">
             <Plus className="size-4" /> Create Coupon
           </Button>
         )}
@@ -121,7 +121,7 @@ export function CouponManager({ initialCoupons }: CouponManagerProps) {
       {showForm && (
         <form
           onSubmit={handleSave}
-          className="rounded-3xl border bg-card p-6 shadow-xs space-y-4 max-w-2xl"
+          className="rounded-2xl sm:rounded-3xl border bg-card p-4 sm:p-6 shadow-xs space-y-4 max-w-2xl"
         >
           <div className="flex items-center justify-between border-b pb-3">
             <h2 className="font-bold text-sm">Create New Promo Coupon</h2>
@@ -242,8 +242,65 @@ export function CouponManager({ initialCoupons }: CouponManagerProps) {
         </form>
       )}
 
-      {/* Coupons Table */}
-      <div className="rounded-3xl border bg-card overflow-hidden shadow-xs">
+      {/* Mobile Card View (< md) */}
+      <div className="space-y-3 md:hidden">
+        {coupons.map((c) => (
+          <div key={c.id} className="rounded-2xl border bg-card p-4 shadow-xs space-y-3">
+            <div className="flex items-start justify-between gap-2">
+              <div className="flex items-center gap-1.5 font-mono font-bold text-foreground text-sm">
+                <Tag className="size-4 text-primary shrink-0" />
+                <span className="tracking-wider">{c.code}</span>
+              </div>
+              <span
+                className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold ${
+                  c.isActive
+                    ? "bg-emerald-500/10 text-emerald-700"
+                    : "bg-muted text-muted-foreground"
+                }`}
+              >
+                {c.isActive ? "Active" : "Disabled"}
+              </span>
+            </div>
+
+            <div className="flex items-baseline gap-2">
+              <span className="text-lg font-black text-primary">
+                {c.type === "percentage" ? `${c.value}% OFF` : `${formatINR(c.value)} OFF`}
+              </span>
+              {c.minOrderAmount > 0 ? (
+                <span className="text-xs text-muted-foreground">
+                  min. {formatINR(c.minOrderAmount)}
+                </span>
+              ) : (
+                <span className="text-xs text-muted-foreground">No minimum</span>
+              )}
+            </div>
+
+            <div className="flex items-center justify-between pt-2 border-t text-xs text-muted-foreground">
+              <span>
+                Uses: <strong className="text-foreground">{c.usageCount}</strong> {c.usageLimit ? `/ ${c.usageLimit}` : "times"}
+              </span>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-8 px-2.5 text-xs text-destructive hover:bg-destructive/10 hover:text-destructive gap-1"
+                onClick={() => handleDelete(c.code)}
+                aria-label={`Delete ${c.code}`}
+              >
+                <Trash2 className="size-3.5" />
+                Delete
+              </Button>
+            </div>
+          </div>
+        ))}
+        {coupons.length === 0 && (
+          <div className="p-8 text-center text-xs text-muted-foreground border rounded-2xl bg-card">
+            No coupons created yet.
+          </div>
+        )}
+      </div>
+
+      {/* Desktop Coupons Table (>= md) */}
+      <div className="hidden md:block rounded-3xl border bg-card overflow-hidden shadow-xs">
         {coupons.length > 0 ? (
           <table className="w-full text-left text-xs">
             <thead className="border-b bg-muted/30 text-muted-foreground uppercase text-[10px] tracking-wider">

@@ -6,11 +6,14 @@ import {
   isValidElement,
   useContext,
   useEffect,
+  useState,
   type HTMLAttributes,
   type MouseEvent,
   type ReactElement,
   type ReactNode,
 } from "react";
+import { createPortal } from "react-dom";
+import { X } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
@@ -130,6 +133,11 @@ export function SheetContent({
   ...props
 }: HTMLAttributes<HTMLDivElement> & { side?: "left" | "right" }) {
   const { open, setOpen } = useContext(SheetContext);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     if (!open) return;
@@ -145,25 +153,34 @@ export function SheetContent({
     };
   }, [open, setOpen]);
 
-  if (!open) return null;
+  if (!open || !mounted) return null;
 
-  return (
-    <div className="fixed inset-0 z-50" role="dialog" aria-modal="true" {...props}>
+  return createPortal(
+    <div className="fixed inset-0 z-50 overflow-hidden" role="dialog" aria-modal="true" {...props}>
       <div
         aria-hidden="true"
-        className="absolute inset-0 bg-black/50"
+        className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity"
         onClick={() => setOpen(false)}
       />
       <div
         className={cn(
-          "absolute top-0 flex h-full w-80 flex-col gap-6 bg-background p-6 shadow-lg",
-          side === "left" ? "left-0" : "right-0",
+          "fixed inset-y-0 z-10 flex h-full w-80 max-w-[85vw] flex-col gap-6 bg-background p-6 shadow-2xl",
+          side === "left" ? "left-0 border-r" : "right-0 border-l",
           className,
         )}
       >
+        <button
+          type="button"
+          onClick={() => setOpen(false)}
+          className="absolute right-4 top-4 z-20 rounded-md p-1.5 text-muted-foreground opacity-70 transition-opacity hover:bg-accent hover:text-foreground hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring"
+          aria-label="Close"
+        >
+          <X className="size-4" />
+        </button>
         {children}
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
 

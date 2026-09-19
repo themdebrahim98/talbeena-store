@@ -147,19 +147,43 @@ export interface AdminDashboardMetrics {
   lowStockCount: number;
   recentOrders: Array<Order & { id: string }>;
   lowStockProducts: AdminProductRow[];
+  averageOrderValue: number;
+  ordersByStatus: {
+    pending: number;
+    processing: number;
+    shipped: number;
+    delivered: number;
+    cancelled: number;
+    returns: number;
+  };
+  todayRevenue: number;
+  todayOrdersCount: number;
 }
 
 export async function getAdminDashboardMetrics(): Promise<AdminDashboardMetrics> {
+  const emptyMetrics: AdminDashboardMetrics = {
+    totalRevenue: 0,
+    totalOrders: 0,
+    totalProducts: 0,
+    totalCustomers: 0,
+    lowStockCount: 0,
+    recentOrders: [],
+    lowStockProducts: [],
+    averageOrderValue: 0,
+    ordersByStatus: {
+      pending: 0,
+      processing: 0,
+      shipped: 0,
+      delivered: 0,
+      cancelled: 0,
+      returns: 0,
+    },
+    todayRevenue: 0,
+    todayOrdersCount: 0,
+  };
+
   if (!isAdminConfigured()) {
-    return {
-      totalRevenue: 0,
-      totalOrders: 0,
-      totalProducts: 0,
-      totalCustomers: 0,
-      lowStockCount: 0,
-      recentOrders: [],
-      lowStockProducts: [],
-    };
+    return emptyMetrics;
   }
 
   try {
@@ -181,6 +205,59 @@ export async function getAdminDashboardMetrics(): Promise<AdminDashboardMetrics>
       (o) => o.status !== "CANCELLED" && o.status !== "FAILED",
     );
     const totalRevenue = validPaidOrders.reduce((acc, o) => acc + (o.total || 0), 0);
+
+    const now = Date.now();
+    const oneDayAgo = now - 24 * 60 * 60 * 1000;
+
+    let todayRevenue = 0;
+    let todayOrdersCount = 0;
+
+    const ordersByStatus = {
+      pending: 0,
+      processing: 0,
+      shipped: 0,
+      delivered: 0,
+      cancelled: 0,
+      returns: 0,
+    };
+
+    for (const o of orders) {
+      if (o.createdAt >= oneDayAgo) {
+        todayOrdersCount++;
+        if (o.status !== "CANCELLED" && o.status !== "FAILED") {
+          todayRevenue += o.total || 0;
+        }
+      }
+
+      switch (o.status) {
+        case "PENDING":
+          ordersByStatus.pending++;
+          break;
+        case "CONFIRMED":
+        case "PROCESSING":
+          ordersByStatus.processing++;
+          break;
+        case "SHIPPED":
+          ordersByStatus.shipped++;
+          break;
+        case "DELIVERED":
+          ordersByStatus.delivered++;
+          break;
+        case "CANCELLED":
+        case "FAILED":
+          ordersByStatus.cancelled++;
+          break;
+        case "RETURN_REQUESTED":
+        case "RETURN_APPROVED":
+        case "RETURN_REJECTED":
+        case "REFUNDED":
+          ordersByStatus.returns++;
+          break;
+      }
+    }
+
+    const averageOrderValue =
+      validPaidOrders.length > 0 ? Math.round(totalRevenue / validPaidOrders.length) : 0;
 
     const allProducts = Object.entries(rawProducts).map(([slug, p]) => ({
       slug,
@@ -209,18 +286,14 @@ export async function getAdminDashboardMetrics(): Promise<AdminDashboardMetrics>
       totalCustomers: Object.keys(rawUsers).length,
       lowStockCount: lowStockProducts.length,
       recentOrders: orders.slice(0, 6),
-      lowStockProducts: lowStockProducts.slice(0, 5),
+      lowStockProducts: lowStockProducts.slice(0, 6),
+      averageOrderValue,
+      ordersByStatus,
+      todayRevenue,
+      todayOrdersCount,
     };
   } catch {
-    return {
-      totalRevenue: 0,
-      totalOrders: 0,
-      totalProducts: 0,
-      totalCustomers: 0,
-      lowStockCount: 0,
-      recentOrders: [],
-      lowStockProducts: [],
-    };
+    return emptyMetrics;
   }
 }
 

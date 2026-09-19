@@ -445,7 +445,7 @@ export function ProductForm({
         </fieldset>
       )}
 
-      <Button type="submit" disabled={isPending}>
+      <Button type="submit" disabled={isPending} className="w-full sm:w-auto">
         {isPending ? pendingLabel : submitLabel}
       </Button>
     </form>

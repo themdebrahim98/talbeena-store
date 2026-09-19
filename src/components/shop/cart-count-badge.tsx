@@ -37,7 +37,7 @@ export function CartCountBadge({ className }: CartCountBadgeProps) {
   return (
     <span
       className={cn(
-        "absolute -top-1 -right-1.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1 text-[11px] font-semibold text-primary-foreground",
+        "absolute -top-0.5 -right-0.5 flex h-4.5 min-w-4.5 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold text-primary-foreground ring-2 ring-background shadow-xs",
         className,
       )}
     >

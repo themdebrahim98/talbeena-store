@@ -4,6 +4,7 @@ import { Leaf, LogOut } from "lucide-react";
 
 import { getShopUser } from "@/queries/shop";
 import { AdminNav } from "@/components/admin/admin-nav";
+import { AdminHeader } from "@/components/admin/admin-header";
 import { SignOutButton } from "@/components/shop/sign-out-button";
 
 export default async function AdminProtectedLayout({
@@ -46,14 +47,7 @@ export default async function AdminProtectedLayout({
       </aside>
 
       <div className="lg:pl-60">
-        <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b bg-background/80 px-4 backdrop-blur lg:px-8">
-          <span className="text-sm font-medium text-muted-foreground">
-            Talbeena Admin
-          </span>
-          <Link href="/" className="text-sm text-primary hover:underline">
-            View store →
-          </Link>
-        </header>
+        <AdminHeader userEmail={user.email} />
         <main className="p-4 lg:p-8">{children}</main>
       </div>
     </div>

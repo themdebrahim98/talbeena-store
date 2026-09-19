@@ -1,4 +1,6 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
+import { ChevronLeft } from "lucide-react";
 
 import {
   ProductForm,
@@ -52,13 +54,19 @@ export default async function EditProductPage({
   return (
     <div className="mx-auto max-w-3xl space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Edit product</h1>
-        <p className="text-sm text-muted-foreground">
+        <Link
+          href="/admin/products"
+          className="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground hover:text-foreground mb-2"
+        >
+          <ChevronLeft className="size-3.5" /> Back to Products
+        </Link>
+        <h1 className="text-xl sm:text-2xl font-bold tracking-tight">Edit Product</h1>
+        <p className="text-xs sm:text-sm text-muted-foreground">
           {product.name} <span className="text-muted-foreground/70">· /{product.slug}</span>
         </p>
       </div>
 
-      <div className="rounded-xl border bg-card p-4 sm:p-6">
+      <div className="rounded-2xl sm:rounded-3xl border bg-card p-4 sm:p-6 shadow-xs">
         <ProductForm
           action={boundUpdate}
           categories={categories}
