@@ -173,21 +173,24 @@ export function ProductForm({
     }
   }
 
+  const effectiveSlug = allowSlugEdit ? values.slug : defaults.slug;
+  const effectiveSku = minimal ? deriveSku(effectiveSlug) : values.sku;
+
   /** Validate in the browser: block the submit on bad input, keep all values. */
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     const form = new FormData(event.currentTarget);
     const parsed = productSchema.safeParse({
       name: form.get("name"),
-      slug: form.get("slug"),
-      sku: form.get("sku"),
+      slug: (form.get("slug") as string | null) || effectiveSlug || defaults.slug || values.slug,
+      sku: (form.get("sku") as string | null) || effectiveSku || defaults.sku || values.sku,
       categorySlug: form.get("categorySlug"),
       description: form.get("description"),
       ingredients: form.get("ingredients") ?? "",
       tags: form.get("tags") ?? "",
       price: form.get("price"),
       compareAtPrice: form.get("compareAtPrice") ?? "",
-      weight: form.get("weight"),
-      unit: form.get("unit"),
+      weight: form.get("weight") || values.weight || "500",
+      unit: form.get("unit") || values.unit || "g",
       stock: form.get("stock"),
       lowStockThreshold: form.get("lowStockThreshold") ?? 0,
     });
@@ -200,8 +203,6 @@ export function ProductForm({
   }
 
   const error = clientError ?? state.error;
-  const effectiveSlug = allowSlugEdit ? values.slug : defaults.slug;
-  const effectiveSku = minimal ? deriveSku(effectiveSlug) : values.sku;
 
   return (
     <form action={formAction} onSubmit={handleSubmit} className="space-y-6" noValidate>
@@ -248,17 +249,24 @@ export function ProductForm({
               name="slug"
               value={allowSlugEdit ? values.slug : defaults.slug}
               onChange={(e) => {
-                setSlugTouched(true);
-                set("slug", slugify(e.target.value));
+                if (allowSlugEdit) {
+                  setSlugTouched(true);
+                  set("slug", slugify(e.target.value));
+                }
               }}
               readOnly={!allowSlugEdit}
-              disabled={!allowSlugEdit}
+              tabIndex={allowSlugEdit ? 0 : -1}
+              className={!allowSlugEdit ? "bg-muted/50 text-muted-foreground cursor-not-allowed select-none" : ""}
               placeholder="classic-talbina"
               required={allowSlugEdit}
             />
-            {allowSlugEdit && (
+            {allowSlugEdit ? (
               <p className="text-xs text-muted-foreground">
                 Used in URLs and as the database key. Cannot be changed later.
+              </p>
+            ) : (
+              <p className="text-xs text-muted-foreground">
+                Product slug is immutable to maintain persistent URLs and references.
               </p>
             )}
           </div>
