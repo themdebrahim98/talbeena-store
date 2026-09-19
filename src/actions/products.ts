@@ -73,6 +73,9 @@ export async function createProductAction(
     return { error: "Choose a valid category." };
   }
 
+  const rawImageUrl = (formData.get("primaryImageUrl") as string | null)?.trim();
+  const primaryImageUrl = rawImageUrl || PLACEHOLDER_IMAGE;
+
   const now = Date.now();
   const product: Product = {
     name: data.name,
@@ -91,7 +94,7 @@ export async function createProductAction(
     stock: data.stock,
     lowStockThreshold: data.lowStockThreshold,
     ...flags,
-    primaryImageUrl: PLACEHOLDER_IMAGE,
+    primaryImageUrl,
     createdAt: now,
     updatedAt: now,
   };
@@ -107,7 +110,7 @@ export async function createProductAction(
   const imgRef = db.ref("productImages").push();
   const image: ProductImage = {
     productId: data.slug,
-    url: PLACEHOLDER_IMAGE,
+    url: primaryImageUrl,
     alt: data.name,
     sortOrder: 1,
     isPrimary: true,
@@ -121,6 +124,8 @@ export async function createProductAction(
   }
 
   revalidatePath("/admin/products");
+  revalidatePath("/");
+  revalidatePath("/products");
   redirect("/admin/products");
 }
 
@@ -167,8 +172,8 @@ export async function updateProductAction(
   const category = categorySnap.val() as Category | null;
   if (!category) return { error: "Choose a valid category." };
 
-  // Images are static placeholders for now (upload feature lands later).
-  const primaryImageUrl = old.primaryImageUrl ?? PLACEHOLDER_IMAGE;
+  const rawImageUrl = (formData.get("primaryImageUrl") as string | null)?.trim();
+  const primaryImageUrl = rawImageUrl || old.primaryImageUrl || PLACEHOLDER_IMAGE;
 
   const product: Product = {
     ...old,
@@ -215,6 +220,10 @@ export async function updateProductAction(
   }
 
   revalidatePath("/admin/products");
+  revalidatePath(`/admin/products/${slug}`);
+  revalidatePath("/");
+  revalidatePath("/products");
+  revalidatePath(`/products/${slug}`);
   redirect("/admin/products");
 }
 

@@ -2,14 +2,17 @@
 
 import Image from "next/image";
 import { useActionState, useState } from "react";
+import { Check, Sparkles, Upload } from "lucide-react";
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/primitives/alert";
 import { Button } from "@/components/primitives/button";
 import { Input } from "@/components/primitives/input";
 import { Label } from "@/components/primitives/label";
+import { toast } from "@/components/primitives/toast";
 import type { ActionState } from "@/actions/auth";
 import type { AdminCategory } from "@/queries/admin";
 import { productSchema } from "@/validations/product";
+import { PRODUCT_PRESET_IMAGES } from "@/config/product-presets";
 
 export interface ProductFormDefaults {
   name: string;
@@ -126,6 +129,38 @@ export function ProductForm({
     isNew: defaults.isNew,
   });
   const [slugTouched, setSlugTouched] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<string>(
+    defaults.primaryImageUrl || "/images/products/talbina-classic.jpg",
+  );
+  const [uploading, setUploading] = useState(false);
+  const [showGallery, setShowGallery] = useState(false);
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    const fd = new FormData();
+    fd.append("file", file);
+
+    try {
+      const res = await fetch("/api/admin/upload-image", {
+        method: "POST",
+        body: fd,
+      });
+      const data = await res.json();
+      if (res.ok && data.url) {
+        setSelectedImage(data.url);
+        toast.success("Image uploaded successfully!");
+      } else {
+        toast.error(data.error || "Failed to upload image");
+      }
+    } catch {
+      toast.error("Network error uploading image");
+    } finally {
+      setUploading(false);
+    }
+  };
 
   function set<K extends keyof typeof values>(key: K, value: (typeof values)[K]) {
     setValues((prev) => ({ ...prev, [key]: value }));
@@ -401,20 +436,127 @@ export function ProductForm({
         </>
       )}
 
-      <div className="space-y-2">
-        <span className="text-sm leading-none font-medium">Product image</span>
-        <div className="flex items-center gap-4">
-          <Image
-            src={defaults.primaryImageUrl ?? "/images/product-placeholder.svg"}
-            alt="Product image"
-            width={80}
-            height={80}
-            className="size-20 shrink-0 rounded-lg border object-cover"
-          />
-          <p className="text-xs text-muted-foreground">
-            Static placeholder for now — photo uploads land later.
-          </p>
+      <div className="space-y-3 rounded-2xl border bg-muted/20 p-4 sm:p-5">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+          <div>
+            <Label className="text-sm font-bold text-foreground">Product Image</Label>
+            <p className="text-xs text-muted-foreground">
+              Select from real catalog presets, upload your own photo, or enter a URL.
+            </p>
+          </div>
+          <input type="hidden" name="primaryImageUrl" value={selectedImage} />
         </div>
+
+        {/* Selected Image Preview & Controls */}
+        <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+          <div className="relative size-24 sm:size-28 shrink-0 overflow-hidden rounded-2xl border-2 border-primary/40 bg-card shadow-xs">
+            <Image
+              src={selectedImage || "/images/product-placeholder.svg"}
+              alt="Selected product"
+              fill
+              sizes="112px"
+              className="object-cover"
+            />
+          </div>
+
+          <div className="space-y-2 flex-1 min-w-0">
+            <div className="flex flex-wrap items-center gap-2">
+              <Button
+                type="button"
+                variant={showGallery ? "default" : "outline"}
+                size="sm"
+                className="gap-1.5 text-xs h-8"
+                onClick={() => setShowGallery(!showGallery)}
+              >
+                <Sparkles className="size-3.5" />
+                {showGallery ? "Hide Presets" : "Choose from Presets"}
+              </Button>
+
+              <label className="inline-flex items-center gap-1.5 rounded-lg border bg-background px-3 py-1.5 text-xs font-medium cursor-pointer shadow-xs hover:bg-accent transition-colors">
+                <Upload className="size-3.5 text-primary" />
+                <span>{uploading ? "Uploading…" : "Upload Custom Photo"}</span>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileUpload}
+                  disabled={uploading}
+                  className="sr-only"
+                />
+              </label>
+            </div>
+
+            <div className="flex items-center gap-2 pt-1">
+              <Input
+                placeholder="Or paste direct image URL…"
+                value={selectedImage}
+                onChange={(e) => setSelectedImage(e.target.value)}
+                className="text-xs h-8 max-w-md bg-card"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Preset Gallery Grid */}
+        {showGallery && (
+          <div className="space-y-2.5 pt-3 border-t">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold text-foreground uppercase tracking-wider">
+                Catalog Preset Photos ({PRODUCT_PRESET_IMAGES.length})
+              </span>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="text-xs h-6 px-2"
+                onClick={() => setShowGallery(false)}
+              >
+                Close
+              </Button>
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5 max-h-72 overflow-y-auto p-1">
+              {PRODUCT_PRESET_IMAGES.map((preset) => {
+                const isSelected = selectedImage === preset.url;
+                return (
+                  <button
+                    type="button"
+                    key={preset.url}
+                    onClick={() => {
+                      setSelectedImage(preset.url);
+                      toast.success(`Selected: ${preset.label}`);
+                    }}
+                    className={`group relative flex flex-col items-start gap-1 rounded-xl border p-2 text-left transition-all ${
+                      isSelected
+                        ? "border-primary bg-primary/10 ring-2 ring-primary/40 shadow-xs"
+                        : "hover:border-primary/50 hover:bg-card"
+                    }`}
+                  >
+                    <div className="relative aspect-square w-full overflow-hidden rounded-lg bg-muted">
+                      <Image
+                        src={preset.url}
+                        alt={preset.label}
+                        fill
+                        sizes="100px"
+                        className="object-cover group-hover:scale-105 transition-transform duration-200"
+                      />
+                      {isSelected && (
+                        <div className="absolute top-1 right-1 flex size-5 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-xs">
+                          <Check className="size-3" />
+                        </div>
+                      )}
+                    </div>
+                    <span className="text-[11px] font-semibold text-foreground line-clamp-1">
+                      {preset.label}
+                    </span>
+                    <span className="text-[9px] text-muted-foreground uppercase font-bold">
+                      {preset.category}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
       </div>
 
       {!minimal && (

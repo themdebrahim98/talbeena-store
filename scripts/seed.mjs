@@ -164,7 +164,28 @@ for (const p of products) {
     isFeatured: p.isFeatured,
     isBestSeller: p.isBestSeller,
     isNew: p.isNew,
-    primaryImageUrl: PLACEHOLDER,
+    primaryImageUrl:
+      p.slug === "talbina-classic" || p.slug === "talbina-mix-pack"
+        ? "/images/products/talbina-classic.jpg"
+        : p.slug === "talbina-with-nuts"
+        ? "/images/products/talbina-nuts.jpg"
+        : p.slug === "talbina-with-dates"
+        ? "/images/products/talbina-dates.jpg"
+        : p.slug === "premium-californian-almonds"
+        ? "/images/products/californian-almonds.jpg"
+        : p.slug === "roasted-kaju-cashews" || p.slug === "roasted-chana-gram"
+        ? "/images/products/roasted-cashews.jpg"
+        : p.slug === "tunisian-dates" || p.slug === "munakka-dried-grapes"
+        ? "/images/products/tunisian-dates.jpg"
+        : p.slug === "stone-ground-barley-flour" || p.slug === "multi-millet-flour"
+        ? "/images/products/barley-flour.jpg"
+        : p.slug === "organic-rolled-oats" || p.slug === "flaxseed-power-mix"
+        ? "/images/products/organic-oats.jpg"
+        : p.slug === "honey-ginger-immunity-mix" || p.slug === "digestive-seed-mix"
+        ? "/images/products/honey-ginger-mix.jpg"
+        : p.slug === "chocolate-protein-bites"
+        ? "/images/products/chocolate-protein-bites.jpg"
+        : PLACEHOLDER,
     createdAt: now,
     updatedAt: now,
   };
@@ -173,13 +194,13 @@ for (const p of products) {
   if (p.isBestSeller) { updates[`productIndex/byBestSeller/${p.slug}`] = true; best++; }
   if (p.isNew) { updates[`productIndex/byNew/${p.slug}`] = true; fresh++; }
 
-  // Primary placeholder image (only if the product has no images yet)
+  // Primary image
   const existing = await db.ref("productImages").orderByChild("productId").equalTo(p.slug).get();
   if (!existing.exists()) {
     const imgRef = db.ref("productImages").push();
     updates[`productImages/${imgRef.key}`] = {
       productId: p.slug,
-      url: PLACEHOLDER,
+      url: updates[`products/${p.slug}`].primaryImageUrl,
       alt: p.name,
       sortOrder: 1,
       isPrimary: true,
